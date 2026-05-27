@@ -46,12 +46,11 @@
   }
   /* Replace the src below with the real path to your uploaded logo image */
   .nav-logo-img {
-    height: 44px;
-    width: 44px;
-    border-radius: 50%;
-    border: 1.5px solid var(--gold);
-    object-fit: cover;
-    background: var(--crimson-mid);
+    height: 50px;
+    width: 50px;
+    border-radius: 0;
+    object-fit: contain;
+    background: transparent;
   }
   .nav-brand {
     font-family: 'Cormorant Garamond', serif;
@@ -99,6 +98,43 @@
     white-space: nowrap;
   }
   .nav-cta:hover { background: var(--gold-light); }
+
+  /* Join dropdown */
+  .nav-join-wrap { position: relative; }
+  .nav-join-dropdown {
+    display: none;
+    position: absolute;
+    top: calc(100% + 8px);
+    right: 0;
+    background: var(--crimson-dark);
+    border: 1.5px solid var(--gold);
+    border-radius: 2px;
+    min-width: 200px;
+    z-index: 200;
+    overflow: hidden;
+  }
+  .nav-join-dropdown.open { display: block; }
+  .nav-join-dropdown a {
+    display: flex;
+    flex-direction: column;
+    padding: 0.9rem 1.2rem;
+    text-decoration: none;
+    border-bottom: 1px solid rgba(196,147,42,0.2);
+    transition: background 0.15s;
+  }
+  .nav-join-dropdown a:last-child { border-bottom: none; }
+  .nav-join-dropdown a:hover { background: var(--crimson-mid); }
+  .nav-join-dropdown a strong {
+    font-size: 0.8rem;
+    color: var(--gold);
+    font-weight: 600;
+    letter-spacing: 0.05em;
+  }
+  .nav-join-dropdown a span {
+    font-size: 0.72rem;
+    color: var(--gold-pale);
+    margin-top: 2px;
+  }
 
   /* Mobile nav toggle */
   .nav-toggle { display: none; background: none; border: none; cursor: pointer; padding: 4px; }
@@ -607,7 +643,7 @@
 
   /* ── RESPONSIVE ── */
   @media (max-width: 768px) {
-    .nav-links, .nav-cta { display: none; }
+    .nav-links, .nav-join-wrap { display: none; }
     .nav-toggle { display: block; }
     nav.open .nav-links {
       display: flex;
@@ -619,7 +655,23 @@
       gap: 1.2rem;
       border-bottom: 2px solid var(--gold);
     }
-    nav.open .nav-cta { display: block; margin-top: 0.5rem; text-align: center; }
+    nav.open .nav-join-wrap {
+      display: block;
+      position: static;
+      margin-top: 0.5rem;
+    }
+    nav.open .nav-join-wrap .nav-cta {
+      display: block;
+      width: 100%;
+      text-align: center;
+      cursor: pointer;
+    }
+    nav.open .nav-join-dropdown {
+      position: static;
+      border: none;
+      border-top: 1px solid rgba(196,147,42,0.2);
+      min-width: unset;
+    }
     .about-grid, .festa-grid, .heritage-inner { grid-template-columns: 1fr; gap: 2rem; }
     .pillars-grid { grid-template-columns: 1fr; }
     .membership-grid { grid-template-columns: 1fr; max-width: 320px; }
@@ -638,9 +690,7 @@
       Upload your logo image to the same folder as this HTML file,
       then change the src to: src="sphga-logo.png"
     -->
-    <div class="nav-logo-img" style="display:flex;align-items:center;justify-content:center;">
-      <span style="font-family:'Cormorant Garamond',serif;font-size:1rem;color:var(--gold);font-weight:700;">✦</span>
-    </div>
+    <img src="sphga-logo.png" class="nav-logo-img" alt="SPHGA Logo">
     <span class="nav-brand">
       SPHGA
       <small>San Pablo Holy Ghost Assoc.</small>
@@ -652,14 +702,24 @@
     <li><a href="#festa">Festa 2026</a></li>
     <li><a href="#heritage">Heritage</a></li>
     <li><a href="#membership">Membership</a></li>
+    <li><a href="https://www.instagram.com/sanpabloholyghost/" target="_blank" rel="noopener">Instagram</a></li>
     <li><a href="#contact">Contact</a></li>
   </ul>
 
-  <!--
-    MEMBERSHIP BUTTON: Replace # with your Square Individual Membership product URL
-    Example: href="https://sphga.square.site/product/individual-membership/..."
-  -->
-  <a href="https://checkout.square.site/merchant/MLHYM44VQC6MG/checkout/NJ7GG5J4LJNZ2AYQH64HNYEU" class="nav-cta" id="nav-cta-link" target="_blank" rel="noopener">Join — $25 / $35</a>
+  <!-- Join dropdown -->
+  <div class="nav-join-wrap" id="nav-join-wrap">
+    <button class="nav-cta" id="nav-join-btn" aria-haspopup="true" aria-expanded="false">Join — $25 / $35 ▾</button>
+    <div class="nav-join-dropdown" id="nav-join-dropdown">
+      <a href="https://checkout.square.site/merchant/MLHYM44VQC6MG/checkout/NJ7GG5J4LJNZ2AYQH64HNYEU" target="_blank" rel="noopener">
+        <strong>Individual Membership</strong>
+        <span>$25 / year</span>
+      </a>
+      <a href="https://checkout.square.site/merchant/MLHYM44VQC6MG/checkout/7SEDNB32VTBT642MBIXR5MEG" target="_blank" rel="noopener">
+        <strong>Family Membership</strong>
+        <span>$35 / year</span>
+      </a>
+    </div>
+  </div>
 
   <button class="nav-toggle" id="nav-toggle" aria-label="Toggle navigation">
     <span></span><span></span><span></span>
@@ -1032,6 +1092,21 @@
   // Close nav on link click (mobile)
   document.querySelectorAll('#nav-links a').forEach(link => {
     link.addEventListener('click', () => nav.classList.remove('open'));
+  });
+
+  // Join dropdown toggle
+  const joinBtn = document.getElementById('nav-join-btn');
+  const joinDropdown = document.getElementById('nav-join-dropdown');
+  joinBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    joinDropdown.classList.toggle('open');
+    joinBtn.setAttribute('aria-expanded', joinDropdown.classList.contains('open'));
+  });
+
+  // Close dropdown when clicking outside
+  document.addEventListener('click', () => {
+    joinDropdown.classList.remove('open');
+    joinBtn.setAttribute('aria-expanded', 'false');
   });
 </script>
 
